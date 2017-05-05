@@ -33,10 +33,12 @@ int main()
   uWS::Hub h;
 
   PID pid;
-  // TODO: Initialize the pid variable.
+  //: Initialize the pid variable.
+  // Using the twiddle method to find the range first and manual tuning to make the car drive more smooth.
+  // https://en.wikipedia.org/wiki/PID_controller#Manual_tuning as reference to adjust the coefficient
   double Kp = 0.1;  // proportional coefficient
   double Ki = 0.0005;  // integral coefficient
-  double Kd = 20.0;  // differential coefficient
+  double Kd = 5.0;  // differential coefficient
   pid.Init(Kp, Ki, Kd);
 
   h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
@@ -56,19 +58,35 @@ int main()
           double angle = std::stod(j[1]["steering_angle"].get<std::string>());
           double steer_value;
           /*
-          * TODO: Calcuate steering value here, remember the steering value is
+          *: Calcuate steering value here, remember the steering value is
           * [-1, 1].
           * NOTE: Feel free to play around with the throttle and speed. Maybe use
           * another PID controller to control the speed!
           */
           pid.UpdateError(cte);
           steer_value = pid.TotalError();
+          // limit the steer angle while finding the coefficients
+//          if (steer_value > 1){
+//        	  steer_value = 1;
+//          }
+//          else if (steer_value < -1){
+//        	  steer_value = -1;
+//          }
           // DEBUG
-          std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
-
+          std::cout << "CTE: " << cte << " Steering Value: "  << std::endl;
+          // Using to find P, I, D coefficients
+//          std::cout << " Kp = " << pid.Kp << " Ki = " << pid.Ki << " Kd = " << pid.Kd << " dpp = " << pid.dpp << " dpi= " << pid.dpi << " dpd = " << pid.dpd << std::endl;
+//          std::cout << " nb = " << pid.nb_frames  << std::endl;
           json msgJson;
           msgJson["steering_angle"] = steer_value;
-          msgJson["throttle"] = 0.6;
+          // limit the speed while finding the coefficients
+//          if (std::abs(cte) > 1){
+//              msgJson["throttle"] = 0.1;
+//          }
+//          else{
+//        	  msgJson["throttle"] = 0.3;
+//          }
+          msgJson["throttle"] = 0.7;
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
           std::cout << msg << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
