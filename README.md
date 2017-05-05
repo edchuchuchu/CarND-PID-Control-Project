@@ -6,7 +6,7 @@ Self-Driving Car Engineer Nanodegree Program
 
 A proportional–integral–derivative controller (PID controller) is a control loop feedback mechanism (controller) commonly this simulator. A PID controller continuously calculates an crosstrack_erro value as the difference between a desired setpoint and a measured process variable and applies a correction based on proportional, integral, and derivative terms (sometimes denoted P, I, and D respectively) which give their name to the controller type.
 
-reference: [PID_controller](https://en.wikipedia.org/wiki/PID_controller/)
+reference: [PID_controller](https://en.wikipedia.org/wiki/PID_controller)
 
 ## P, I, D coefficients
 
