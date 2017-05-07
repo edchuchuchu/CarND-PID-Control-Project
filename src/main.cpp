@@ -80,7 +80,7 @@ int main()
           // std::cout << " nb = " << pid.nb_frames  << std::endl;
           json msgJson;
           msgJson["steering_angle"] = steer_value;
-          // Adjust the speed with steer angle and cte;
+          // Adjust the speed with steer angle and cte
           if (std::fabs(steer_value) > 0.8 || std::fabs(cte) > 1.0){
         	  steer_speed = 0.2;
           }
