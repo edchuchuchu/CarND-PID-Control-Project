@@ -10,7 +10,7 @@ reference: [PID_controller](https://en.wikipedia.org/wiki/PID_controller)
 
 ## P, I, D coefficients
 
-For the hyperparameters, I usd twiddle algorithm (coordinate ascent) at the beginning to find the coefficients range. 
+For the hyperparameters, I used twiddle algorithm (coordinate ascent) at the beginning to find the coefficients range. 
 And manual tuning it to make the car drive more smooth.
 
 reference: [Manual_tuning](https://en.wikipedia.org/wiki/PID_controller#Manual_tuning)
