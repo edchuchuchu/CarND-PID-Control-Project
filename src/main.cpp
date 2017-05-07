@@ -38,7 +38,7 @@ int main()
   // https://en.wikipedia.org/wiki/PID_controller#Manual_tuning as reference to adjust the coefficient
   double Kp = 0.1;  // proportional coefficient
   double Ki = 0.0005;  // integral coefficient
-  double Kd = 5.0;  // differential coefficient
+  double Kd = 10.0;  // differential coefficient
   pid.Init(Kp, Ki, Kd);
 
   h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
@@ -57,6 +57,7 @@ int main()
           double speed = std::stod(j[1]["speed"].get<std::string>());
           double angle = std::stod(j[1]["steering_angle"].get<std::string>());
           double steer_value;
+          double steer_speed;
           /*
           *: Calcuate steering value here, remember the steering value is
           * [-1, 1].
@@ -65,28 +66,35 @@ int main()
           */
           pid.UpdateError(cte);
           steer_value = pid.TotalError();
-          // limit the steer angle while finding the coefficients
-//          if (steer_value > 1){
-//        	  steer_value = 1;
-//          }
-//          else if (steer_value < -1){
-//        	  steer_value = -1;
-//          }
+          // limit the steer angle between 1 to -1
+          if (steer_value > 1){
+        	  steer_value = 1;
+          }
+          else if (steer_value < -1){
+        	  steer_value = -1;
+          }
           // DEBUG
-          std::cout << "CTE: " << cte << " Steering Value: "  << std::endl;
+          // std::cout << "CTE: " << cte << " Steering Value: "  << steer_value << std::endl;
           // Using to find P, I, D coefficients
-//          std::cout << " Kp = " << pid.Kp << " Ki = " << pid.Ki << " Kd = " << pid.Kd << " dpp = " << pid.dpp << " dpi= " << pid.dpi << " dpd = " << pid.dpd << std::endl;
-//          std::cout << " nb = " << pid.nb_frames  << std::endl;
+          // std::cout << " Kp = " << pid.Kp << " Ki = " << pid.Ki << " Kd = " << pid.Kd << " dpp = " << pid.dpp << " dpi= " << pid.dpi << " dpd = " << pid.dpd << std::endl;
+          // std::cout << " nb = " << pid.nb_frames  << std::endl;
           json msgJson;
           msgJson["steering_angle"] = steer_value;
-          // limit the speed while finding the coefficients
-//          if (std::abs(cte) > 1){
-//              msgJson["throttle"] = 0.1;
-//          }
-//          else{
-//        	  msgJson["throttle"] = 0.3;
-//          }
-          msgJson["throttle"] = 0.7;
+          // Adjust the speed with steer angle and cte;
+          if (std::fabs(steer_value) > 0.8 || std::fabs(cte) > 1.0){
+        	  steer_speed = 0.2;
+          }
+          else if (std::fabs(steer_value) > 0.6 || std::fabs(cte) > 0.7){
+        	  steer_speed = 0.35;
+          }
+          else if (std::fabs(steer_value) > 0.3 ){
+        	  steer_speed = 0.5;
+          }
+          else{
+        	  steer_speed = 0.7;
+          }
+
+          msgJson["throttle"] = steer_speed;
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
           std::cout << msg << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
